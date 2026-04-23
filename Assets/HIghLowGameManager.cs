@@ -1,6 +1,7 @@
 
 using UnityEngine;
 using TMPro;
+using System.Collections.Generic;
 
 public class HighLowGameManager : MonoBehaviour
 {
@@ -9,14 +10,17 @@ public class HighLowGameManager : MonoBehaviour
     public TextMeshProUGUI streakText;
 
     int currentCard;
-
-    // 🔹 連勝管理を委譲
-    StreakManager streakManager = new StreakManager();
+    List<IGameRule> rules = new List<IGameRule>();
 
     void Start()
     {
+        // ルール登録（ここだけ触る）
+        rules.Add(new StreakRule(streakText));
+
+        foreach (var rule in rules)
+            rule.OnGameStart();
+
         DrawFirstCard();
-        UpdateStreakUI();
     }
 
     void DrawFirstCard()
@@ -26,53 +30,27 @@ public class HighLowGameManager : MonoBehaviour
         resultText.text = "";
     }
 
-    public void OnHighButton()
-    {
-        Judge(true);
-    }
-
-    public void OnLowButton()
-    {
-        Judge(false);
-    }
+    public void OnHighButton() => Judge(true);
+    public void OnLowButton() => Judge(false);
 
     void Judge(bool isHigh)
     {
         int nextCard = Random.Range(1, 14);
+        GameResult result;
 
-        // 🔸 DRAW
         if (nextCard == currentCard)
-        {
-            resultText.text = "DRAW";
-            streakManager.Draw();
-        }
+            result = GameResult.Draw;
+        else if (isHigh && nextCard > currentCard ||
+                 !isHigh && nextCard < currentCard)
+            result = GameResult.Win;
         else
-        {
-            bool isWin = isHigh
-                ? nextCard > currentCard
-                : nextCard < currentCard;
-
-            if (isWin)
-            {
-                resultText.text = "WIN!";
-                streakManager.Win();
-            }
-            else
-            {
-                resultText.text = "LOSE...";
-                streakManager.Lose();
-            }
-        }
+            result = GameResult.Lose;
 
         currentCard = nextCard;
         cardText.text = currentCard.ToString();
-        UpdateStreakUI();
-    }
+        resultText.text = result.ToString().ToUpper();
 
-    void UpdateStreakUI()
-    {
-        streakText.text =
-            $"Current Streak: {streakManager.CurrentStreak}\n" +
-            $"Max Streak: {streakManager.MaxStreak}";
+        foreach (var rule in rules)
+            rule.OnResult(result);
     }
 }
