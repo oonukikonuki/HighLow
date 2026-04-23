@@ -13,7 +13,6 @@ public class HighLowGameManager : MonoBehaviour
         DrawFirstCard();
     }
 
-    // 最初の1枚を引く
     void DrawFirstCard()
     {
         currentCard = Random.Range(1, 14);
@@ -21,23 +20,30 @@ public class HighLowGameManager : MonoBehaviour
         resultText.text = "";
     }
 
-    // HIGHボタン
     public void OnHighButton()
     {
         Judge(true);
     }
 
-    // LOWボタン
     public void OnLowButton()
     {
         Judge(false);
     }
 
-    // 勝敗判定
     void Judge(bool isHigh)
     {
         int nextCard = Random.Range(1, 14);
 
+        // ① 引き分け判定（最優先）
+        if (nextCard == currentCard)
+        {
+            currentCard = nextCard;
+            cardText.text = currentCard.ToString();
+            resultText.text = "DRAW";
+            return;
+        }
+
+        // ② 勝敗判定
         bool isWin;
 
         if (isHigh)
@@ -49,11 +55,8 @@ public class HighLowGameManager : MonoBehaviour
             isWin = nextCard < currentCard;
         }
 
-        // 次のカードを表示
         currentCard = nextCard;
         cardText.text = currentCard.ToString();
-
-        // 結果表示
         resultText.text = isWin ? "WIN!" : "LOSE...";
     }
 }
