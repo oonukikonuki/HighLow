@@ -1,3 +1,4 @@
+
 using UnityEngine;
 using TMPro;
 
@@ -5,12 +6,17 @@ public class HighLowGameManager : MonoBehaviour
 {
     public TextMeshProUGUI cardText;
     public TextMeshProUGUI resultText;
+    public TextMeshProUGUI streakText;
 
     int currentCard;
+
+    // 🔹 連勝管理を委譲
+    StreakManager streakManager = new StreakManager();
 
     void Start()
     {
         DrawFirstCard();
+        UpdateStreakUI();
     }
 
     void DrawFirstCard()
@@ -34,29 +40,39 @@ public class HighLowGameManager : MonoBehaviour
     {
         int nextCard = Random.Range(1, 14);
 
-        // ① 引き分け判定（最優先）
+        // 🔸 DRAW
         if (nextCard == currentCard)
         {
-            currentCard = nextCard;
-            cardText.text = currentCard.ToString();
             resultText.text = "DRAW";
-            return;
-        }
-
-        // ② 勝敗判定
-        bool isWin;
-
-        if (isHigh)
-        {
-            isWin = nextCard > currentCard;
+            streakManager.Draw();
         }
         else
         {
-            isWin = nextCard < currentCard;
+            bool isWin = isHigh
+                ? nextCard > currentCard
+                : nextCard < currentCard;
+
+            if (isWin)
+            {
+                resultText.text = "WIN!";
+                streakManager.Win();
+            }
+            else
+            {
+                resultText.text = "LOSE...";
+                streakManager.Lose();
+            }
         }
 
         currentCard = nextCard;
         cardText.text = currentCard.ToString();
-        resultText.text = isWin ? "WIN!" : "LOSE...";
+        UpdateStreakUI();
+    }
+
+    void UpdateStreakUI()
+    {
+        streakText.text =
+            $"Current Streak: {streakManager.CurrentStreak}\n" +
+            $"Max Streak: {streakManager.MaxStreak}";
     }
 }
