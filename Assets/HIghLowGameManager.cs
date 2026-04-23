@@ -5,11 +5,30 @@ public class HighLowGameManager : MonoBehaviour
 {
     public TextMeshProUGUI cardText;
 
+    int currentCard;
+
     void Start()
     {
-        int cardNumber = Random.Range(1, 14);
-        cardText.text = cardNumber.ToString();
+        DrawNewCard();
+    }
 
-        Debug.Log("Card Number: " + cardNumber);
+    void DrawNewCard()
+    {
+        currentCard = Random.Range(1, 14);
+        cardText.text = currentCard.ToString();
+
+        Debug.Log("Current Card: " + currentCard);
+    }
+
+    public void OnHighButton()
+    {
+        Debug.Log("HIGH button pressed");
+        DrawNewCard();
+    }
+
+    public void OnLowButton()
+    {
+        Debug.Log("LOW button pressed");
+        DrawNewCard();
     }
 }
