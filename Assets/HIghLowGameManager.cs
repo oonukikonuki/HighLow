@@ -38,6 +38,9 @@ public class HighLowGameManager : MonoBehaviour
         );
         rules.Add(loseLimitRule);
 
+        // ★ ここを追加
+        rules.Add(new PointRule(pointText));
+
         // --- Retry ボタン設定 ---
         retryButton.GetComponent<Button>()
             .onClick.AddListener(() => loseLimitRule.Retry());
@@ -129,4 +132,6 @@ public class HighLowGameManager : MonoBehaviour
 
         DrawFirstCard();
     }
+    public TextMeshProUGUI pointText;
+    
 }
